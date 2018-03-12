@@ -1,13 +1,17 @@
 import json
 import csv
 
+def allFieldsPresent(jsondata):
+    return len(jsondata.keys()) == 9
+
 #SHORT DATA
-f=open('../datasets/amazon_review_electronic_short.json','r')
-w=open('amazonReviewElectronicShortCSV.csv','w')
+#f=open('../datasets/amazon_review_electronic_short.json','r')
+#f=open('jsondata_test.json','r')
+#w=open('amazonReviewElectronicShortCSV.csv','w')
 
 #LONGER/ACTUAL DATA
-#f=open('../datasets/amazon_review_electronic_full.json','r')
-#w=open('../datasets/CSV_AMAZON_REVIEW_ELECTRONIC_FULL.csv','w')
+f=open('../datasets/amazon_review_electronic_full.json','r')
+w=open('../datasets/CSV_AMAZON_REVIEW_ELECTRONIC_FULL.csv','w')
 
 csvwriter = csv.writer(w)
 
@@ -19,8 +23,12 @@ for line in f:
         print header
         csvwriter.writerow(header)
         
-    rowcount += 1    
-    csvwriter.writerow(jsondata.values())
+    rowcount += 1
+
+    # Only convert if all fields are present. Some docs do not have reviewerName.
+    if allFieldsPresent(jsondata):
+        csvwriter.writerow(jsondata.values())
+        
     if rowcount % 100000 == 0:
         print 'Processing Mark:',rowcount
 
