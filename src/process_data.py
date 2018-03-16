@@ -1,7 +1,9 @@
 import csv
 import gensim
 import nltk
+
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from pprint import pprint
 from collections import defaultdict
 
@@ -37,40 +39,40 @@ stoplist.update(['-'])
 texts = [[ word for word in document.lower().split() if word not in stoplist]
          for document in documents]
 
-#pprint (texts[0])
-#print '\n\n\n'
-
-# Remove tokens with single occurrence
-frequency = defaultdict(int)
-for text in texts:
-    for token in text:
-        frequency[token] += 1
-
-texts = [[token for token in text
-          if frequency[token] > 1 and token.isalpha()]
-         for text in texts]
-
-#pprint texts[0]
 
 #Store dictionary as binary/txt using gensim
 dictionary = gensim.corpora.Dictionary(texts)
 #dictionary.save('./dict/amazon_electronic_review.dict')
 dictionary.save_as_text('./dict/amazon_slectronic_review_text.txt')
 
-#pprint(dictionary.token2id)
-#print(dictionary.token2id)
-
-doc_bow = [dictionary.doc2bow(text) for text in texts]
-print(texts[0])
-print(doc_bow[0])
 
 #
 # TF-IDF Vectorizing using scikitlearn
 #
 
-#vectorizer = TfidfVectorizer(stop_words=stoplist, use_idf=True)
-#V = vectorizer.fit_transform(documents)
-#pprint(V)
-#print V
+tfidf_vectorizer = TfidfVectorizer(stop_words=stoplist, use_idf=True)
+V = tfidf_vectorizer.fit_transform(documents)
+
+#
+# Mapping feature score to actual words in doc
+#
+#document_number=0
+#feature_names = tfidf_vectorizer.get_feature_names()
+#feature_index = V[document_number,:].nonzero()[1]
+#tfidf_scores = zip(feature_index, [V[document_number, x] for x in feature_index])
+#for word, score in [(feature_names[index], score) for (index, score) in tfidf_scores]:
+#  print str(word) + ' => ' + str(score)
+
+#
+# Calculating the pairwise cosine similarity for each document in corpus
+#
+
+cs_results = cosine_similarity(V[0:3], V)
+doc_num = 1
+for i_result in cs_results:
+    print "Document#:" + str(doc_num)
+    print str(i_result) + '\n\n'
+    doc_num += 1
+
 
 print '\n\n==END==\n\n'
