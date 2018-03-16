@@ -70,8 +70,8 @@ V = tfidf_vectorizer.fit_transform(documents)
 cs_results = cosine_similarity(V[0:3], V)
 doc_num = 1
 for i_result in cs_results:
-    print "Document#:" + str(doc_num)
-    print str(i_result) + '\n\n'
+    print "Document#: ",doc_num,'\n'
+    print i_result,'\n\n'
     doc_num += 1
 
 
