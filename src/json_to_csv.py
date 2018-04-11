@@ -4,7 +4,7 @@ import csv
 def allFieldsPresent(jsondata):
     return len(jsondata.keys()) == 9
 
-#SHORT DATA
+#SHORT DATA.
 #f=open('../datasets/amazon_review_electronic_short.json','r')
 #f=open('jsondata_test.json','r')
 #w=open('amazonReviewElectronicShortCSV.csv','w')
