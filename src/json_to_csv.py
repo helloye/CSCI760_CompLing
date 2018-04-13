@@ -29,8 +29,12 @@ for line in f:
     if allFieldsPresent(jsondata):
         csvwriter.writerow(jsondata.values())
         
-    if rowcount % 100000 == 0:
+    if rowcount % 1000 == 0:
         print 'Processing Mark:',rowcount
+
+    # Limiter to process smaller dataset.
+    if rowcount == 10000:
+        break;
 
 w.close()
 f.close()
