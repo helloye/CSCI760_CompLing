@@ -7,8 +7,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
 
-from matplotlib.pyplot import *
-from numpy import *
+from matplotlib import pyplot as plt
+import numpy as np
 
 from pprint import pprint
 
@@ -90,17 +90,31 @@ print "Shape of V:", V.shape
 #
 # T-SNE Plotting
 #
+#vectorized_plot = []
+#for x in range (0,99)
+#print V[1, :].nonzero()[1]
+
+
 V_tsne = TSNE(learning_rate=100).fit_transform(V.toarray())
-figure(figsize=(20,15))
-subplot(121)
-scatter(V_tsne[:, 0], V_tsne[:,1])
+
+print "Shape of V_tsne: ", V_tsne.shape
+
+x = V_tsne[:,0]
+y = V_tsne[:,1]
+
+points = V_tsne[:,0:0]
+color = np.sqrt((points**2).sum(axis=1))/np.sqrt(2.0)
+rgb = plt.get_cmap('jet')(color)
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1)
+ax.scatter(x,y,color=rgb)
+plt.show()
 
 #
 # K-Means Clustering
 #
 
 km = KMeans(n_clusters=7, init='k-means++', n_init=10, max_iter=300)
-
 km.fit(V)
 
 print km.predict(V)
