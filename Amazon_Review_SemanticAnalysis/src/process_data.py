@@ -1,6 +1,8 @@
 import pandas as pd
 import nltk
 
+#Test comment
+
 from html2text import unescape
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -11,12 +13,15 @@ from matplotlib import pyplot as plt
 from matplotlib import colors
 import numpy as np
 
-kmeanColors = ['red', 'green', 'blue', 'purple', 'orange', 'black']
+kmeanColors = ['red', 'green', 'blue', 'purple', 'orange']
 #kmeanColors = ['blue', 'blue', 'blue', 'blue', 'blue']
+#kmeanColors = ['red', 'green', 'blue']
+
+# Load stop words to reduce noise
+stoplist = set(nltk.corpus.stopwords.words('english'))
+stoplist.update(['-', 'yet', 'yea', 'zs15'])
 
 def print_top_features(cluster_number, dataframe):
-    stoplist = set(nltk.corpus.stopwords.words('english'))
-    stoplist.update(['-', 'yet'])
     
     cluster=dataframe.loc[dataframe['cluster']==cluster_number]
     cluster_tfidf = TfidfVectorizer(stop_words=stoplist, use_idf=True)
@@ -35,14 +40,23 @@ df=pd.read_csv('../datasets/testdata.csv')
 df=df[df.reviewText.str.len() > 5]
 df.reviewText = df.reviewText.apply(unescape, unicode_snob=True)
 
-# Load stop words to reduce noise
-stoplist = set(nltk.corpus.stopwords.words('english'))
-stoplist.update(['-', 'yet', 'yea'])
 
 # Create tf-idf vectorizer, using SKLearn
 tfidf_vectorizer = TfidfVectorizer(stop_words=stoplist, use_idf=True)
 V = tfidf_vectorizer.fit_transform(df.reviewText)
 
+
+# TSNE - Reducing dimension size for above tf-idf scores to 2d to be able to plot
+V_tsne = TSNE(learning_rate=100).fit_transform(V.toarray())
+
+
+#
+# K-Means Clustering
+#
+
+km = KMeans(n_clusters=5, init='k-means++', n_init=50, max_iter=1000)
+km.fit(V)
+kmeanV = km.predict(V)
 
 # Calculating the pairwise cosine similarity for each document in corpus
 # Uncomment below if you wish to view cosine similarities, and top occurring words.
@@ -68,20 +82,12 @@ V = tfidf_vectorizer.fit_transform(df.reviewText)
 #for word, score in [(feature_names[index], score) for (index, score) in tfidf_scores]:
 #  print (str(word) + ' => ' + str(score))
 
-# TSNE - Reducing dimension size for above tf-idf scores to 2d to be able to plot
-V_tsne = TSNE(learning_rate=100).fit_transform(V.toarray())
 
-#
-# K-Means Clustering
-#
-
-km = KMeans(n_clusters=6, init='k-means++', n_init=10, max_iter=1000)
-km.fit(V_tsne)
-kmeanV = km.predict(V_tsne)
 
 # Tag each document with it's respective cluster in the dataframe
 
 df['cluster'] = kmeanV
+
 
 # Print it's top term
 print_top_features(0, df)
@@ -89,7 +95,6 @@ print_top_features(1, df)
 print_top_features(2, df)
 print_top_features(3, df)
 print_top_features(4, df)
-print_top_features(5, df)
 
 # Plot data in 2-D using matplotlib
 # Grab all x and y coordiantes
