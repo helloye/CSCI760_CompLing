@@ -32,4 +32,6 @@ Before running the script, we must provide the dataset needed. For this project,
 
 Once the dataset is set, you will need to run `clean_data.py` first to clean up the raw json and output a `testdata.csv` file that will be used by the main `/src/process_data.py` script. Once you have `testdata.csv` updated with the test data, simply run `/src/process_data.py` to output and visualize the results as seen in the jupyter notebook. I have left comments throughout the file to describe what each section is doing. Please feel free to reach out to me below if you have any questions
 
+[Link to the jupyter notebook in this project.](./jupyter/notebook.ipynb)
+
 ye [at] weby3 [dot] com
