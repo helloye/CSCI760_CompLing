@@ -22,6 +22,39 @@ kmeanColors = ['red', 'green', 'blue', 'purple', 'orange']
 stoplist = set(nltk.corpus.stopwords.words('english'))
 stoplist.update(['-', 'yet', 'yea', 'zs15'])
 
+############################
+# Helper fuctions + Values #
+############################
+
+#Wait for plot to close before continuing with the script
+#Set to true if you want to see hover effects and interact with plot
+#If false, will just print out all plots at the end
+
+blockPlotting = False
+
+# Hover over annotation/labeling.
+def update_annot(ind):
+    
+    pos = sc.get_offsets()[ind['ind'][0]]
+    annot.xy = pos
+    text = 'Review#: {}'.format(ind['ind'][0])
+    annot.set_text(text)
+    annot.get_bbox_patch().set_alpha(1)
+
+
+def hover(event):
+    vis = annot.get_visible()
+    if event.inaxes == ax:
+        cont, ind = sc.contains(event)
+        if cont:
+            update_annot(ind)
+            annot.set_visible(True)
+            fig.canvas.draw_idle()
+        else:
+            if vis:
+                annot.set_visible(False)
+                fig.canvas.draw_idle()
+
 def print_top_features(cluster_number, dataframe):
     
     cluster=dataframe.loc[dataframe['cluster']==cluster_number]
@@ -35,6 +68,10 @@ def print_top_features(cluster_number, dataframe):
     top_features = [features[i] for i in indices[:top_n]]
     print('{} - {}'.format(kmeanColors[cluster_number],top_features))
 
+
+#
+# START PROCESSING
+#
 
 # Load the review/text corpus
 df=pd.read_csv('../datasets/testdata.csv')
@@ -134,34 +171,11 @@ annot.set_visible(False)
 
 sc = ax.scatter(x,y,c=kmeanV,cmap=colors.ListedColormap(kmeanColors))
 
-# Hover over annotation/labeling.
-def update_annot(ind):
-    
-    pos = sc.get_offsets()[ind['ind'][0]]
-    annot.xy = pos
-    text = 'Review#: {}'.format(ind['ind'][0])
-    annot.set_text(text)
-    annot.get_bbox_patch().set_alpha(1)
-
-
-def hover(event):
-    vis = annot.get_visible()
-    if event.inaxes == ax:
-        cont, ind = sc.contains(event)
-        if cont:
-            update_annot(ind)
-            annot.set_visible(True)
-            fig.canvas.draw_idle()
-        else:
-            if vis:
-                annot.set_visible(False)
-                fig.canvas.draw_idle()
-
 
 fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-plt.show(block=False)
+plt.show(block=blockPlotting)
 
 ##################################################
 # 3d scatter plotting section (WORK IN PROGRESS) #
@@ -180,11 +194,22 @@ V_tsne = TSNE(n_components=embedded_dim, learning_rate=100).fit_transform(V.toar
 fig3d = plt.figure()
 ax = fig3d.add_subplot(111, projection='3d')
 
+annot = ax.annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
+                    bbox=dict(boxstyle="round", fc="w"),
+                    arrowprops=dict(arrowstyle="->"))
+annot.set_visible(False)
+
+# TODO: Fix hover over annotation....
+#       Or just figure out how to identify each point easily.
+# fig3d.canvas.mpl_connect("motion_notify_event", hover)
+
 xs = V_tsne[:,0]
 ys = V_tsne[:,1]
 zs = V_tsne[:,2]
 
 ax.scatter(xs,ys,zs, c=kmeanV, cmap=colors.ListedColormap(kmeanColors))
-plt.show(block=False)
+
+
+plt.show(block=blockPlotting)
 
 print ('\n\n==END==\n\n')
