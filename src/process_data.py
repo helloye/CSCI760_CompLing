@@ -9,6 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
 from sklearn.manifold import TSNE
 
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot as plt
 from matplotlib import colors
 import numpy as np
@@ -84,9 +85,13 @@ for i_result in cs_results:
     print (i_result,'\n\n')
     doc_num += 1
 
-# TSNE - Reducing dimension size for above tf-idf scores to 2d to be able to plot
-V_tsne = TSNE(learning_rate=100).fit_transform(V.toarray())
+# TSNE - Reducing dimension size for above tf-idf scores to 2d/3d to be able to plot
 
+#Embedd to dimension (value = {2 or 3}
+embedded_dim = 2
+
+#Run TSNE *THIS IS VERY EXPENSIVE OPERATION*
+V_tsne = TSNE(n_components=embedded_dim, learning_rate=100).fit_transform(V.toarray())
 
 #
 # K-Means Clustering
@@ -95,8 +100,8 @@ V_tsne = TSNE(learning_rate=100).fit_transform(V.toarray())
 #Use V if you want to run k-mean on the full unreduced vector.
 
 km = KMeans(n_clusters=5, init='k-means++', n_init=50, max_iter=1000)
-km.fit(V_tsne)
-kmeanV = km.predict(V_tsne)
+km.fit(V)
+kmeanV = km.predict(V)
 
 
 
@@ -156,6 +161,30 @@ def hover(event):
 fig.canvas.mpl_connect("motion_notify_event", hover)
 
 
-plt.show()
+plt.show(block=False)
+
+##################################################
+# 3d scatter plotting section (WORK IN PROGRESS) #
+##################################################
+
+#
+# K-Means Clustering
+#
+
+#Embedd to dimension (value = {2 or 3}
+embedded_dim = 3
+
+#Run TSNE
+V_tsne = TSNE(n_components=embedded_dim, learning_rate=100).fit_transform(V.toarray())
+
+fig3d = plt.figure()
+ax = fig3d.add_subplot(111, projection='3d')
+
+xs = V_tsne[:,0]
+ys = V_tsne[:,1]
+zs = V_tsne[:,2]
+
+ax.scatter(xs,ys,zs, c=kmeanV, cmap=colors.ListedColormap(kmeanColors))
+plt.show(block=False)
 
 print ('\n\n==END==\n\n')
