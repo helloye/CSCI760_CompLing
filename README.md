@@ -34,4 +34,4 @@ Once the dataset is set, you will need to run `clean_data.py` first to clean up 
 
 [Link to the jupyter notebook in this project.](./jupyter/notebook.ipynb)
 
-ye [at] weby3 [dot] com
+ye [at] y3p [dot] io
